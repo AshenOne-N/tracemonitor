@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for,  request, current_app
+from flask import render_template, flash, redirect, url_for, request, current_app
 from flask_login import current_user
 from tracemonitor import app
 from forms import SignUpForm, LoginForm
@@ -15,6 +15,7 @@ def index():
 @app.route('/signup')
 def sign_up():
     form = SignUpForm()
+
     return render_template('signup.html', form=form)
 
 
@@ -40,7 +41,8 @@ def login():
 @app.route('/auth')
 @login_required
 def auth():
-    return render_template('auth.html')
+    records = Record.query.order_by(Record.timestamp.desc()).all()
+    return render_template('auth.html', records=records)
 
 
 @app.route('/logout')
