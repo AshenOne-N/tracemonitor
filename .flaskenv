@@ -1,0 +1,2 @@
+FLASK_APP=tracemonitor.py
+FLASK_ENV=development
