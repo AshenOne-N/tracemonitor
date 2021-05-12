@@ -4,12 +4,15 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_wtf import CSRFProtect
+import cv2
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 login_manager.login_view = 'auth'
+camera  =  cv2.VideoCapture(0)
+
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = os.getenv('SECRET_KEY', 'dev key')

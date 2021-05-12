@@ -1,7 +1,9 @@
 import os
-from flask import render_template, flash, redirect, url_for, request, current_app,send_from_directory,jsonify
+from flask import render_template, flash, redirect, url_for, request, current_app, send_from_directory, jsonify, \
+    Response
 from flask_login import current_user
 from tracemonitor import app, db
+from initapp import camera
 from forms import SignUpForm, LoginForm
 from flask_login import login_required, login_user, logout_user
 from flask_wtf.csrf import CSRFError
@@ -9,6 +11,9 @@ from models import Admin, User, Record
 import uuid
 import qrcode as qr
 import random
+import pyzbar.pyzbar as pzb
+import cv2
+
 
 @app.route('/')
 def index():
@@ -42,11 +47,13 @@ def sign_up():
 def result(user_id):
     user = User.query.get_or_404(user_id)
     filename = user.qr_img + '.png'
-    return  render_template('result.html', filename=filename)
+    return render_template('result.html', filename=filename)
+
 
 @app.route('/store/<path:filename>')
 def get_image(filename):
-    return send_from_directory(current_app.config['STORE_PATH'],filename)
+    return send_from_directory(current_app.config['STORE_PATH'], filename)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -82,16 +89,34 @@ def logout():
     flash('Logout success!', 'info')
     return redirect(url_for('login'))
 
+
 @app.route('/update-info')
 def update_info():
-    prefix_s = '扫描成功！'
-    prefix_f = '扫描失败！'
-    num = random.randint(1,User.query.count() * 2)
-    if num > User.query.count():
-        return jsonify(message=prefix_f)
-    else:
-        user = User.query.get(num)
-        username = user.username
-        stcard = user.st_card
-        message = prefix_s + username + stcard
-        return jsonify(message=message)
+    prefix_f = '请出示二维码'
+    img = cv2.imread('./imgs/6.jpg', cv2.IMREAD_UNCHANGED)
+    if not img is None:
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        barcodes = pzb.decode(gray)
+        if len(barcodes) > 0:
+            barcodedata = barcodes[0].data.decode('utf-8')
+            return jsonify(message=barcodedata)
+    return jsonify(message=prefix_f)
+
+
+def gen(camera):
+    """Video streaming generator function."""
+    prefix = './imgs/'
+    while True:
+        sss, img = camera.read()
+        cv2.imwrite('./imgs/6.jpg', img)
+        ret, jpeg = cv2.imencode('.jpg', img)
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+@app.route('/video_feed')
+def video_feed():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    return Response(gen(camera),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
