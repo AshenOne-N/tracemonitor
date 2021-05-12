@@ -1,5 +1,5 @@
 import os
-from flask import render_template, flash, redirect, url_for, request, current_app,send_from_directory
+from flask import render_template, flash, redirect, url_for, request, current_app,send_from_directory,jsonify
 from flask_login import current_user
 from tracemonitor import app, db
 from forms import SignUpForm, LoginForm
@@ -8,7 +8,7 @@ from flask_wtf.csrf import CSRFError
 from models import Admin, User, Record
 import uuid
 import qrcode as qr
-
+import random
 
 @app.route('/')
 def index():
@@ -81,3 +81,17 @@ def logout():
     form = LoginForm()
     flash('Logout success!', 'info')
     return redirect(url_for('login'))
+
+@app.route('/update-info')
+def update_info():
+    prefix_s = '扫描成功！'
+    prefix_f = '扫描失败！'
+    num = random.randint(1,User.query.count() * 2)
+    if num > User.query.count():
+        return jsonify(message=prefix_f)
+    else:
+        user = User.query.get(num)
+        username = user.username
+        stcard = user.st_card
+        message = prefix_s + username + stcard
+        return jsonify(message=message)

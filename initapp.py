@@ -8,6 +8,7 @@ from flask_wtf import CSRFProtect
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 login_manager = LoginManager()
+csrf = CSRFProtect()
 login_manager.login_view = 'auth'
 def create_app():
     app = Flask(__name__)
@@ -20,6 +21,7 @@ def create_app():
     bootstrap.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
+    csrf.init_app(app)
 
     return app
 

@@ -47,9 +47,7 @@
 
                 </div>
                 <div class="col-md-4 align-self-center">
-                    <h1>扫描成功</h1>
-                    <h4>姓名：付楷</h4>
-                    <h4>学号：123456789101</h4>
+                    <h1 id="result-description" data-href="{{ url_for('update_info') }}">扫描成功<br/>付楷<br/>123456789101</h1>
                 </div>
             </div>
         </div>
@@ -77,5 +75,9 @@
 <script type="text/javascript" src="{{ url_for('static',filename='js/popper.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static',filename='js/script.js') }}"></script>
+<script type="text/javascript">
+        var csrf_token = "{{ csrf_token() }}";
+
+    </script>
 </body>
 </html>
