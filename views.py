@@ -98,7 +98,7 @@ def update_info():
         barcodes = pzb.decode(gray)
         if len(barcodes) > 0:
             barcodedata = barcodes[0].data.decode('utf-8')
-            user = User.query.filter_by(qr_img=barcodedata)
+            user = User.query.filter_by(qr_img=barcodedata).first()
             if not user is None:
                 record = Record(user=user)
                 db.session.add(record)
