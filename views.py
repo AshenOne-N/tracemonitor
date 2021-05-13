@@ -100,7 +100,7 @@ def update_info():
             barcodedata = barcodes[0].data.decode('utf-8')
             user = User.query.filter_by(qr_img=barcodedata)
             if not user is None:
-                record = Record(user=user.id)
+                record = Record(user=user)
                 db.session.add(record)
                 db.session.commit()
                 message = '扫码成功' + user.username + str(user.st_card)

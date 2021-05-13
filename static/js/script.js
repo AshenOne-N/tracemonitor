@@ -20,7 +20,7 @@ $(function () {
     }
 
     if ( $("#result-description").length > 0 ) {
-       setInterval(update_info, 3000);
+       setInterval(update_info, 2000);
     }
 
 });
