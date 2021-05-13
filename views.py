@@ -36,7 +36,6 @@ def sign_up():
                    )
         db.session.add(usr)
         db.session.commit()
-        db.session.rollback()
         img = qr.make(qrs)
         img.save(os.path.join(store_path, qrs + '.png'))
         return redirect(url_for('result', user_id=usr.id))
@@ -99,7 +98,13 @@ def update_info():
         barcodes = pzb.decode(gray)
         if len(barcodes) > 0:
             barcodedata = barcodes[0].data.decode('utf-8')
-            return jsonify(message=barcodedata)
+            user = User.query.filter_by(qr_img=barcodedata)
+            if not user is None:
+                record = Record(user=user.id)
+                db.session.add(record)
+                db.session.commit()
+                message = '扫码成功' + user.username + str(user.st_card)
+                return jsonify(message=message)
     return jsonify(message=prefix_f)
 
 
