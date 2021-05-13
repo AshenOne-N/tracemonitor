@@ -20,7 +20,7 @@ def index():
     return render_template('base.html')
 
 
-@app.route('/signup')
+@app.route('/signup',methods=['GET','POST'])
 def sign_up():
     form = SignUpForm()
     if form.validate_on_submit():
